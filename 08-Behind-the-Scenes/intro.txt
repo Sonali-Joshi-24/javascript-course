@@ -1,0 +1,263 @@
+JavaScript :
+    Javascript is a high-level, prototype-based, object-oriented, multi-paradigm, interpreted
+    OR Just-In-Time Compiled, Dynamic, Single-Threaded, Garbage Collected Programming 
+    Language with First-Class Function and a Non-Blocking Event Loop Concurrency Model
+
+1. High - Level : Developers does not have to worry everything happens automatically
+
+2. Garbage Collection : automatically removes un-used objects from computer memory
+
+3. interpreted or just-in-time Compiled : JS helps converting human code into Machine code 
+
+4. multi paradigm : paradigm --> is an approach and mindset of structuring code, which will direct your coding style and technique
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+90. JavaScript Runtime Engine
+1. JS Engine : Programs that executes JavaScript Code, Eg. V8 Engine
+    JS Engine consist of 2 components - Call stack and Heap, call stack is where our code is executed using (execution context) || and the heap is an un-structured memory pool
+    that stores all objects that our code needs
+    - How the code is compiled to machine code ?
+        - Compilation Vs Interpretation 
+          i. Compilation : Entire code is converted into machine code at once and written to a binary file that can be executed by a computer 
+          ii. Interpretation : Interpreter runs through the source code and executes it line by line (but code still needs to be converted to machine code)
+          iii. Just-in-time (JIT) Compilation : Entire Code is converted into machine code at once then executed immediately
+    Steps of code being compiled to machine code :
+    1) The Code is "Parsed" to a Data Structure known as AST(Abstract Syntax Tree) (This step also checks if there are any Syntax errors)
+    2) The next step is "Compilation" which takes the generated AST and compiles it To "machine code"
+    3) This "machine code " then gets "executed" right away
+    4) JS has an tendency to start executing code as soon as he can so he starts by executing the un-optimized code and then in background the executed code is run through 
+        "optimization" then this optimized code is compiled and again made available for execution and the cycle continues without disrupting the 
+        flow of execution
+
+    - JS Runtime In the Browser
+        i. JS runtime is JS Engine but engines are not enough we also need access the WEB APIs (DOM, timers, Fetch API) || In short WEB APIs is the functionalites provided to 
+        the engine, accessible on window object but they are not part of JavaScript Language itself 
+        ii. JS itself get the access to this API using the global window objects || but also web API is the part of runtime 
+        iii. A typical JS runtime also contains "CALLBACK QUEUE" - this is a data Structure that contains all the CALLBACK functions that are ready to be "EXECUTED"
+        Example: CALLBACK functions from DOM Event listeners
+
+        Event Loop : takes CALLBACK functions from CALLBACK queue and puts them into Call stack so that they can be executed
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+91. Execution context and The Call stack
+
+1) Our code have just finished compiling and is ready for execution
+-- In execution stage :
+    i. a global execution context is created (for a top level code) -> is basically a code which is not inside any function
+        - What exactly is execution context ? --> it is a environment in which a piece of JavaScript is executed. Stores all the necessary information for some code to be executed
+    ii. Execution of top-level code (inside global EC)
+        - exactly one global execution context created for code that is not inside any function(top-level)
+    iii. Executing functions and waiting for callbacks 
+        - one execution per context per function : for each function call a new execution context is created
+    All together makes the CALL stack
+
+2) What's inside execution Context?
+    i) Variable environment : let, const and var declaration , Functions , arguments object
+    ii) Scope chain : conatins references to variable that are located outside of the current function 
+    iii) this keyword
+    The content of the execution context variable environment, scope chain and this keyword is generated during "creation phase" right before execution
+    Thing To remember "Arrow function does not contain arguments object and this keyword" 
+
+    Example:
+    const name = 'Jonas'
+
+    const first = () => {
+        let a = 1
+        const b = second(7,9)
+        a = a + b
+        return a 
+    }
+    function second(x,y){
+        var c = 2
+        return c
+    }
+    const x = first()
+
+    Global : name = 'Jonas' , first = <function> , second = <function>, x = <unknown> ..... literally the function code, needs to run first() first
+    first() : a = 1, b = <unknown> ......need to run second() first
+    second() : c = 2, arguments = [7,9]  ......Array of passed arguments. available in all regular function(not Arrow)
+
+3) CallStack
+-- Place where execution context get stacked on top of each other to keep track of where we are in the execution
+    Example:
+    const name = 'Jonas'
+
+    const first = () => {
+        let a = 1
+        const b = second(7,9)
+        a = a + b
+        return a 
+    }
+    function second(x,y){
+        var c = 2
+        return c
+    }
+    const x = first()
+
+    compiled code starts execution
+
+
+    ------------------------  
+->  second()                         --> now in function second() we come across return statement (hence second() will be popped out of CallStack)
+    ------------------------
+    first()
+    ------------------------
+    Global Execution Context         -->(created for top level code, all the code outside the function is executed, this GEC will be put on top of call stack)
+    ------------------------
+          CALL STACK
+
+after popping second()
+    ------------------------  
+    ------------------------
+-->  first()                        --> now in first() we again encounter return() hence it will pop() the first() from stack
+    ------------------------
+    Global Execution Context         
+    ------------------------
+          CALL STACK
+
+after popping first()
+    ------------------------  
+    ------------------------
+    ------------------------
+--> Global Execution Context         
+    ------------------------
+          CALL STACK
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+92. Scope and Scope Chain In JavaScript
+
+- Scope Concept
+    - Scoping : How our program variables are organized and accessed. "Where do variables live? " or "Where can we access a certain variable and where not"
+    - Lexical Scoping : Scoping is controlled by placement of function and block in the code
+    - Scope : Space or enviorment in which certain variable is declared (variable enviorment in case of function), There is a global scope, function scope and block scope
+    - Scope of a variable : is a Region of code where a certain variable can be accessed
+
+- 3 types of Scope
+1. Global scope
+        - outside of any function or block
+        - variables declared in global scope are accessible everywhere
+        eg:
+        const me = "Jonas"
+        const year = 1997
+        const job = "teacher"
+
+
+2. function scope 
+        - variables can be accessed only inside function, NOT outside
+        - also called as local scope
+        eg:
+        function calcAge(birthYear){
+            const now =  2037
+            const age = now - birthYear
+            return age
+        }
+
+
+3. block scope (ES6)
+        eg:
+        if (year >= 1981 && year <= 1996){
+            const millenial = true
+            const food = avacado test
+        }
+
+        - variables are accessiblr on,y inside the block {block scope variable)
+        - however this is only applicable to ker and const variable
+        - functions are also block scoped (olyin strict mode)
+
+----------------------------------------------------------------------------------------------------------------------------
+Summary:
+- Scoping ask the question "where do variable leave" or "where can we access certain variable"
+- there are 3 types of scopre in hjavscript, the global scope, scopess defind unction, scopes defined by block;
+- only let and const variables are block - scoped variables declared with var end up in closest function scope
+- In Javascript we have Lexical scoping so the rules of where we can access variables are exactly where in the code function and block are written
+- Every scope always has access to all the variables from all its outer scopes. This is scope chain !
+- when the variable is not in the current scope the engine looks up in the scope chain until it finds the variable it's looking for, this is called as variable lookup
+- The scope chain is a one-way street: a scope will never ever have access to the variables of an inner scope
+- The scope chain in a certain scope is equal to adding together all the variable environment of all the parent scope
+- The scope chain has nothing to do with the order in which functions were called
+
+
+variables created from "var" keyword are function scoped
+functions are also block scoped starting from ES6
+
+
+
+----------------------------------------------------------------------
+HOISTING IN JavaScript
+
+execution context always contains 3 stuff --> variable environment, scope chain, this keyword
+
+//variables environment
+1. Hoisting : Makes some types of variable accessible/usable in the code before they are actually declared. "variable lifted to top of their scope"
+-----------------------BEHIND THE SCENES--------------------
+Before Execution, code is scanned for variable declaration and for each variable a new property is created in the variable environment object
+
+
+                                    hoisted    |        initial-value      |      scope
+------------------------------------------------------------------------------------------------------------------
+function declaration                yes                Actual function          block  (if in strict mode Otherwise: function scope!)
+var variables                       yes                undefined                Function
+let and const variable              No                 <uninitialized>, TDZ     Block
+                (Technically yes,but not in practice)  (tdz temporal death zone)
+function expression and arrows      Depends if using var or let/const
+
+
+TEMPORAL DEATH zone
+eg:
+const myName = 'Jonas'
+
+if (myName === 'Jonas){
+    console.log(`jonas is a ${job}`)  -------  TDZ for job variable  (reference error: cannot access job before initialization)
+    const age = 2037 - 1997           ------- TDZ for job variable
+    console.local(age)               --------  TDZ for job variable
+    const job = "teacher"
+    console.log(x)                 ------ reference error : x not defined
+}
+
+Why TDZ?
+- Makes it easier to avoid and catch errors: accessing variable before declaration is bad practice and should be avoided
+- makes const variable actually work
+
+Why hoisting?
+- using function before actual declaration
+
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------
+This keyword
+- The this keyword/variable : special variable that is created for every execution context (every function). Takes the value of (point to)
+     the "owner" of the function in which the this keyword is used
+- this is NOT static it depends on how the function is called and its values is only assigned when the function is actually called
+
+`Method this =  <object that is calling the method>`
+
+Example:method Example
+const jonas = {
+    name : "Jonas",
+    year : 1989,
+    calcAge : function(){
+        return 2023 - this.year  // here this means jonas.year
+    }
+}
+jonas.calcAge() //32
+
+`simple function call this = undefined` (in strict mode ! Otherwise: window(in the browser))  
+
+`Arrow funtion this = <this of surrounding function (lexical this)>` - do not get their own this (takes this ref from surrounding func())
+
+`Event listeners this = <DOM element that handler is attached to`
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+
+REVIEW : PRIMITIVES, OBJECTS AND THE JAVASCRIPT Engine
+
+- PRIMITIVES : number , strings, boolean, undefined, null, symbol, bigint 
+- OBJECTS ; object-literal, arrays, function, many more... => REFERENCE TYPES  
+
+sO AT time of execution JS Engine Composes of 2 components : CALL STACK and HEAP 
+So primitive datatypes are stored in CALL STACK    and
+OBJECT are stored in HEAP
+----------------------------------------------------------------------------------------------------------------------------------------
